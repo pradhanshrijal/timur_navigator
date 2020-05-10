@@ -13,7 +13,7 @@
       <remap from="imu/data" to="/imu/data"/>
   </node>
 
-  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_outdoor" clear_params="true">
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_outdoor" clear_params="true" output="screen">
     <!-- remap from="odometry/filtered" to="odometry/filtered_map"/ -->
     <remap from="odometry/filtered" to="/odom" />
   </node>

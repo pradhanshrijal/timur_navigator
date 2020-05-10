@@ -1,0 +1,38 @@
+# Launch files
+calib_package: timur_prime
+calib_launch: include/gps_heading_calibrator.launch 
+local_package: timur_prime
+local_launch: localization/timur_localizer.launch
+collect_package: timur_prime
+collect_launch: include/gps_collector.launch
+follow_package: timur_prime
+follow_launch: include/gps_follower.launch
+
+reset_local_package: timur_prime
+reset_local_launcher: timur_relative_localizer.launch #None # Just file name
+reset_local_node: ekf_localization
+
+# Topic for Modules
+joy_topic: /joy
+gps_topic: /navsat/fix
+mb_topic: /move_base
+
+# Topics for Functions
+calib_status_topic: gps_heading_status
+collect_status_topic: gps_collect_status
+follow_status_topic: gps_follow_status
+
+# Storage File
+wp_package: timur_prime
+wp_file: /waypoints_storage/timur_gps_file.txt
+
+# Frames
+utm_frame: utm 
+odom_frame: odom
+
+# Manual Speeds
+manual_speed: 0.5
+manual_turn: 1.0
+
+# Velocity Publish for keyboard
+vel_pub_topic: /cmd_vel

@@ -6,7 +6,7 @@
   
   <rosparam command="load" file="$(find timur_prime)/param/gps_ekf_params.yaml" />
 
-  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true"/>
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true" output="screen" />
 
   </group>
 
