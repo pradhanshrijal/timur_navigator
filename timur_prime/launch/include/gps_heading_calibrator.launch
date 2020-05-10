@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <group ns="/timur">
+    <!-- Load current navsat parameters -->
+    <rosparam command="load" file="$(find timur_prime)/param/gps_navsat_params.yaml" />
+    <rosparam command="load" file="$(find timur_prime)/param/joystick/timur_joystick_params.yaml" />
+    <rosparam command="load" file="$(find timur_prime)/param/gps_heading_calibrator.yaml" />
+
+    <!-- Start calibration node -->
+    <node name="gps_heading_calibrator" pkg="gps_heading_calibrator" type="gps_heading_calibrator" output="screen" />
+  </group>
+
+</launch>
+

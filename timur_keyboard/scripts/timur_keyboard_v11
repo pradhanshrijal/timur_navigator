@@ -1,0 +1,176 @@
+#!/usr/bin/env python
+
+import roslib; roslib.load_manifest('teleop_twist_keyboard')
+import rospy
+import roslaunch
+import rospkg
+import os
+from std_msgs.msg import Bool
+import sys, select, termios, tty
+
+class timurKeyboardNode():
+	def __init__(self):
+		rospy.init_node('timur_keyboard')
+
+		self.getParams()
+		self.initParams()
+		self.launchSubs()
+		self.getPaths()
+		self.displayInstructions()
+		while not rospy.is_shutdown():
+			self.checkCommands()
+
+	def calibCB(self, calibMsg):
+		self.calibratorStatus = calibMsg.data
+
+	def collectCB(self, collectMsg):
+		self.collectorStatus = collectMsg.data
+
+	def followCB(self, followMsg):
+		self.followerStatus = followMsg.data
+
+	def getKey(self):
+		tty.setraw(sys.stdin.fileno())
+		select.select([sys.stdin], [], [], 0)
+		self.activeKey = sys.stdin.read(1)
+		termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.settings)
+
+	def getParams(self):
+
+		# Number and symbol of the functions in the keyboard
+		self.calibratorButtonNumber = rospy.get_param("calib_but_num")
+		self.calibratorButtonSymbol = rospy.get_param("calib_but_sym")
+		self.localizerButtonNumber = rospy.get_param("local_but_num")
+		self.localizerButtonSymbol = rospy.get_param("local_but_sym")
+		self.collectorButtonNumber = rospy.get_param("collect_but_num")
+		self.collectorButtonSymbol = rospy.get_param("collect_but_sym")
+		self.followerButtonNumber = rospy.get_param("follow_but_num")
+		self.followerButtonSymbol = rospy.get_param("follow_but_sym")
+
+		# Launch files of functions
+		self.calibratorPackage = rospy.get_param("calib_package")
+		self.calibratorLauncher = rospy.get_param("calib_launch")
+		self.localizerPackage = rospy.get_param("local_package")
+		self.localizerLauncher = rospy.get_param("local_launch")
+		self.collectorPackage = rospy.get_param("collect_package")
+		self.collectorLauncher = rospy.get_param("collect_launch")
+		self.followerPackage = rospy.get_param("follow_package")
+		self.followerLauncher = rospy.get_param("follow_launch")
+		
+		self.resetLocalFramePackage = rospy.get_param("reset_local_package")
+		self.resetLocalFrameLauncher = rospy.get_param("reset_local_launcher")
+		self.resetLocalFrameNode = rospy.get_param("reset_local_node")
+
+		self.calibratorStatusTopic = rospy.get_param("calib_status_topic")
+		self.collectorStatusTopic = rospy.get_param("collect_status_topic")
+		self.followerStatusTopic = rospy.get_param("follow_status_topic")
+
+	def initParams(self):
+		self.localizerStatus = False
+		self.calibratorStatus = False
+		self.collectorStatus = False
+		self.followerStatus = False
+
+		self.settings = termios.tcgetattr(sys.stdin)
+		self.keyStack = [self.calibratorButtonSymbol, self.localizerButtonSymbol, self.collectorButtonSymbol, self.followerButtonSymbol]
+
+	def launchSubs(self):
+		rospy.Subscriber(self.calibratorStatusTopic, Bool, self.calibCB)
+		rospy.Subscriber(self.collectorStatusTopic, Bool, self.collectCB)
+		rospy.Subscriber(self.followerStatusTopic, Bool, self.followCB)
+
+	def getPaths(self):
+		rosPackage = rospkg.RosPack()
+
+		self.calibratorPath = rosPackage.get_path(self.calibratorPackage) + "/launch/" + self.calibratorLauncher
+		self.localizerPath = rosPackage.get_path(self.localizerPackage) + "/launch/" + self.localizerLauncher
+		self.collectorPath = rosPackage.get_path(self.collectorPackage) + "/launch/" + self.collectorLauncher
+		self.followerPath = rosPackage.get_path(self.followerPackage) + "/launch/" + self.followerLauncher							
+
+	def displayInstructions(self):
+
+		print ""
+		print "Press %s for calibration" % self.calibratorButtonSymbol
+		print "Press %s for localization" % self.localizerButtonSymbol
+		print "Press %s for collection" % self.collectorButtonSymbol
+		print "Press %s for following" % self.followerButtonSymbol
+		print ""
+
+	def checkCommands(self):
+		self.getKey()
+
+		# Toggle Outdoor Localizer
+		if self.keyStack[1] == self.activeKey:
+			#while self.activeKey == self.keyStack[1]:
+			#	pass
+
+			# Start Localizer
+			if not (self.localizerStatus):
+				rospy.loginfo("Staring Localizer...")
+				self.uuidLocalizer = roslaunch.rlutil.get_or_generate_uuid(None, False)
+				roslaunch.configure_logging(self.uuidLocalizer)
+				self.launchLocalizer = roslaunch.parent.ROSLaunchParent(self.uuidLocalizer, [self.localizerPath]) # uuid, path
+				self.launchLocalizer.start()
+				self.localizerStatus = True
+				if self.resetLocalFrameLauncher.lower() != 'none':
+					os.system('rosnode kill ' + self.resetLocalFrameNode)
+
+			# Stop Localizer
+			elif (self.localizerStatus):
+				rospy.loginfo("Killing Localzier...")
+				rospy.sleep(2)
+				self.launchLocalizer.shutdown()
+				self.displayInstructions()
+				self.localizerStatus = False
+				if self.resetLocalFrameLauncher.lower() != 'none':
+					os.system('roslaunch ' + self.resetLocalFramePackage + ' ' + self.resetLocalFrameLauncher)
+
+		# Start Collection Node
+		if self.keyStack[2] == self.activeKey:
+			#while self.activeKey == self.keyStack[2]:
+			#	pass
+			rospy.loginfo("Starting Collector...")
+			self.uuidFunction = roslaunch.rlutil.get_or_generate_uuid(None, False)
+			roslaunch.configure_logging(self.uuidFunction)
+			self.launchFunction = roslaunch.parent.ROSLaunchParent(self.uuidFunction, [self.collectorPath])
+			self.launchFunction.start()
+
+		# Start Follow Node
+		elif self.keyStack[3] == self.activeKey:
+			#while self.activeKey == self.keyStack[3]:
+			#	pass
+			rospy.loginfo("Starting Follower...")
+			self.uuidFunction = roslaunch.rlutil.get_or_generate_uuid(None, False)
+			roslaunch.configure_logging(self.uuidFunction)
+			self.launchFunction = roslaunch.parent.ROSLaunchParent(self.uuidFunction, [self.followerPath])
+			self.launchFunction.start()
+
+		# Start Calibration Node
+		elif self.keyStack[0] == self.activeKey:
+			#while self.activeKey == self.keyStack[0]:
+			#	pass
+			rospy.loginfo("Starting Calibrator...")
+			self.uuidFunction = roslaunch.rlutil.get_or_generate_uuid(None, False)
+			roslaunch.configure_logging(self.uuidFunction)
+			self.launchFunction = roslaunch.parent.ROSLaunchParent(self.uuidFunction, [self.calibratorPath])
+			self.launchFunction.start()
+
+		if (self.calibratorStatus or self.collectorStatus or self.followerStatus):
+			if (self.calibratorStatus):
+				rospy.loginfo("Killing Calibrator...")
+				self.calibratorStatus = False
+			elif (self.collectorStatus):
+				rospy.loginfo("Killing Collector...")
+				self.collectorStatus = False
+			elif (self.followerStatus):
+				rospy.loginfo("Killing Follower...")
+				self.followerStatus = False
+
+			rospy.sleep(2)
+			self.launchFunction.shutdown()
+			self.displayInstructions()
+
+if __name__ == '__main__':
+	timurKeyboard = timurKeyboardNode();
+	
+	rospy.spin()

@@ -1,0 +1,18 @@
+# Speed Params
+x_vel: 0.5
+x_vel_time: 10
+
+# Output Rate
+rate_output: 30
+
+# Reverse Movement Control
+rev_speed_limit: 0.25
+rev_rep_limit: 4 # 1 by rev_spd_lim 
+
+# Param file
+navsat_params_package: timur_prime
+navsat_params_file: gps_navsat_params.yaml
+
+# Topics
+mb_odom_topic: /odom # Subscribed for Current Pos. Info
+vel_pub_topic: /cmd_vel

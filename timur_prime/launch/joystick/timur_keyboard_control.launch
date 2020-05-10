@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<launch>
+	<group ns="/timur">
+
+    	<rosparam command="load" 
+    				file="$(find timur_prime)/param/joystick/timur_keyboard_params.yaml" />
+    	<rosparam command="load" 
+    				file="$(find timur_prime)/param/joystick/timur_joystick_params.yaml" />
+  		<node pkg="timur_keyboard" 
+  				type="timur_keyboard" 
+  				name="timur_keyboard" 
+  				output="screen"/>
+      <node pkg="teleop_twist_keyboard" 
+            type="teleop_twist_keyboard.py" 
+            name="teleop_twist_keyboard" 
+            output="screen" />
+	</group>
+</launch>
+			

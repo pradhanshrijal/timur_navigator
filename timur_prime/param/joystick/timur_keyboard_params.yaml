@@ -1,0 +1,17 @@
+calib_but_num: 3
+calib_but_sym: a
+
+local_but_num: 0
+local_but_sym: s
+
+collect_but_num: 6
+collect_but_sym: d
+
+engage_but_num: 9
+engage_but_sym: g
+
+end_but_num: 2
+end_but_sym: t
+
+follow_but_num: 10
+follow_but_sym: f

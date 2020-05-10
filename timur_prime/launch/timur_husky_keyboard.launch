@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+	
+	<!-- node name="rviz" pkg="rviz" type="rviz" args="-d $(find timur_prime)/rviz/husky_sim.rviz" / -->
+
+	<include file="$(find husky_gazebo)/launch/husky_empty_world.launch" />
+	<!-- include file="$(find timur_prime)/launch/joystick/teleop_ps4.launch" / -->
+
+	<include file="$(find husky_navigation)/launch/move_base.launch" />
+
+	<include file="$(find timur_prime)/launch/joystick/timur_keyboard_control.launch" />
+</launch>

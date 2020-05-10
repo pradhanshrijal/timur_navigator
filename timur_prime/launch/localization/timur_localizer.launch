@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <group ns="/timur"> 
+  
+  <rosparam command="load" file="$(find timur_prime)/param/gps_ekf_params.yaml" />
+  <rosparam command="load" file="$(find timur_prime)/param/gps_navsat_params.yaml" />
+
+  <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform" clear_params="true" output="screen">
+      <remap from="odometry/filtered" to="/odom"/>
+      <remap from="gps/fix" to="/navsat/fix"/>
+      <remap from="imu/data" to="/imu/data"/>
+  </node>
+
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_outdoor" clear_params="true">
+    <!-- remap from="odometry/filtered" to="odometry/filtered_map"/ -->
+    <remap from="odometry/filtered" to="/odom" />
+  </node>
+
+  </group>
+
+</launch>

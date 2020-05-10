@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<launch>
+    <group ns="/timur">
+
+        <rosparam command="load" file="$(find timur_prime)/param/joystick/timur_ps4_params.yaml" />
+        <rosparam command="load" file="$(find timur_prime)/param/joystick/timur_joystick_params.yaml" />
+
+        <node pkg="gps_collector" type="gps_collector" name="gps_collector" output="screen" />
+    	  
+    </group>
+</launch>

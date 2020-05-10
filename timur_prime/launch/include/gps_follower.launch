@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<launch>
+	<group ns="/timur">
+
+		<rosparam command="load" 
+					file="$(find timur_prime)/param/joystick/timur_joystick_params.yaml" />
+		<node pkg="gps_follower" 
+				type="gps_follower" 
+				name="gps_follower" 
+				output="screen" />
+		
+	</group>
+</launch>

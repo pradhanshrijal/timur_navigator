@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+	<group ns="/outdoor">
+
+    	<rosparam command="load" file="$(find timur_prime)/param/joystick/timur_ps4_params.yaml" />
+    	<rosparam command="load" file="$(find timur_prime)/param/joystick/timur_joystick_params.yaml" />
+
+  		<node pkg="timur_joystick" type="timur_joystick" name="timur_joystick" output="screen"/>
+	
+	</group>
+</launch>
+			

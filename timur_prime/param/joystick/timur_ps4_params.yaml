@@ -1,0 +1,17 @@
+calib_but_num: 2
+calib_but_sym: /\
+
+local_but_num: 0
+local_but_sym: X
+
+collect_but_num: 8
+collect_but_sym: Share
+
+follow_but_num: 11
+follow_but_sym: LS
+
+end_but_num: 3
+end_but_sym: Square
+
+engage_but_num: 12
+engage_but_sym: RS
